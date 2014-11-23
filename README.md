@@ -1,4 +1,4 @@
-finfo
+fInspect
 =====
 
-File Information
+A library for file inspection.
