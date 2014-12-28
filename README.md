@@ -1,8 +1,8 @@
 fInspect
 =========
-[![GPL License](http://img.shields.io/badge/license-GPL-blue.svg?style=flat-square)](http://opensource.org/licenses/GPL-3.0)
+[![AGPL License](http://img.shields.io/badge/license-AGPL%20v3-red.svg?style=flat-square)](http://opensource.org/licenses/AGPL-3.0)
 
-`fInspect` is a file metadata database system written in [Go](http://golang.org).  
+`fInspect` is a file metadata database system written in [Go](http://golang.org).
 It is currently work-in-progress alpha and is not recommended for use yet.
 
 Project Goals
@@ -36,5 +36,4 @@ However we also have a Slack channel for talking directly to developers, testers
 by invitation only (please contact in IRC if you want to join the Slack channel).
 
 All code is licensed under the
-[GPL](https://github.com/syncthing/syncthing/blob/master/LICENSE), v3 or
-later.
+[AGPL](https://github.com/finspect/finspect/blob/master/LICENSE), v3 or later.

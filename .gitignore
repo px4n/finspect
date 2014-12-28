@@ -1,3 +1,10 @@
-finspect.sublime-project
-finspect.sublime-workspace
-bin/
+finspect
+finspect.exe
+*.tar.gz
+*.zip
+*.asc
+*.sublime*
+.idea/
+.jshintrc
+bin
+.DS_Store
