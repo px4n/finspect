@@ -2,13 +2,19 @@ package main
 
 // Import needed packages
 import (
-	"github.com/finspect/finspect"
+	"encoding/json"
+	"github.com/boltdb/bolt"
 	"gopkg.in/fsnotify.v1"
 	"log"
+	"time"
 )
 
-// Example watcher from fsnotify
-func ExampleNewWatcher() {
+type WatchEvent struct {
+	Type fsnotify.Event
+	File string
+}
+
+func ExampleNewWatcher(db *bolt.DB) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -22,6 +28,22 @@ func ExampleNewWatcher() {
 			case event := <-watcher.Events:
 				log.Println("event:", event)
 				if event.Op&fsnotify.Write == fsnotify.Write {
+
+					watchEvent := &WatchEvent{
+						Type: event,
+						File: event.Name,
+					}
+					db.Update(func(tx *bolt.Tx) error {
+						b, err := tx.CreateBucketIfNotExists([]byte("events"))
+						if err != nil {
+							return err
+						}
+						encoded, err := json.Marshal(watchEvent)
+						if err != nil {
+							return err
+						}
+						return b.Put([]byte(time.Now().Format(time.RFC3339)), encoded)
+					})
 					log.Println("modified file:", event.Name)
 				}
 			case err := <-watcher.Errors:
@@ -38,5 +60,10 @@ func ExampleNewWatcher() {
 }
 
 func main() {
-	ExampleNewWatcher()
+	db, err := bolt.Open("/tmp.db", 0644, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	ExampleNewWatcher(db)
 }
