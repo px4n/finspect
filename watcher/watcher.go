@@ -44,7 +44,7 @@ func ExampleNewWatcher(db *bolt.DB) {
 						}
 						return b.Put([]byte(time.Now().Format(time.RFC3339)), encoded)
 					})
-					log.Println("modified file:", event.Name)
+					log.Println("file modified:", event.Name)
 				}
 			case err := <-watcher.Errors:
 				log.Println("error:", err)
