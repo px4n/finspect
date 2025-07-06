@@ -1,9 +1,81 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 finspect.exe
+
+# Archives
 *.tar.gz
 *.zip
 *.asc
-*.sublime*
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.txt
+coverage.html
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Build output
+bin/
+dist/
+
+# IDE specific files
 .idea/
-.jshintrc
-bin
+.vscode/
+*.swp
+*.swo
+*~
 .DS_Store
+*.sublime*
+.jshintrc
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+/tmp/
+
+# Test artifacts
+/test-results/
+/test-reports/
+
+# Local configuration
+/config/local/
+*.local.yaml
+*.local.yml
+
+# Debug files
+debug
+__debug_bin
+
+# OS generated files
+Thumbs.db
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Project specific
+finspect.db
+finspect.db-journal
+*.db
+*.db-journal
+/mounts.json
+/config.json
+docs.private
