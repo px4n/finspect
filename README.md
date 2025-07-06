@@ -1,39 +1,207 @@
-fInspect
-=========
-[![AGPL License](http://img.shields.io/badge/license-AGPL%20v3-red.svg?style=flat-square)](http://opensource.org/licenses/AGPL-3.0)
+# finspect
 
-`fInspect` is a file metadata database system written in [Go](http://golang.org).
-It is currently work-in-progress alpha and is not recommended for use yet.
+A unified filesystem interface for all your data sources - local files, cloud storage, and social media - accessible through a single, POSIX-like API.
 
-Project Goals
--------------
-The `fInspect` project has the following project goals:
+## Vision
 
- 1. Define a file metadata format that can be used with indexing services, metadata management systems, file manager applications and organization etc...
+finspect treats all data sources as a unified filesystem. Whether your files are on your local drive, in Google Drive, or your photos are on Facebook, finspect lets you access and manage them through standard filesystem operations.
 
- 2. To build a complete distributed desktop and mobile application that demostrates the various uses of having such a universal file metadata format.
+## Features
 
-The file metadata format will not be considered stable until fInspect 1.0 is released.
+### Current (Phase 1)
 
-Building
-========
-Coming soon.
+- **Virtual Filesystem (VFS)**: Mount any data source and access it like a local filesystem
+- **Local Filesystem Adaptor**: Full support for local files and directories
+- **POSIX Operations**: Standard file operations (ls, cp, mv, rm, stat)
+- **File Watching**: Real-time notifications for file changes
+- **CLI Interface**: Familiar command-line tools for file management
 
-Documentation
-=============
-Coming soon.
+### Planned (Phase 2+)
 
-Contribute and Feedback
-=============
+- **Cloud Storage Adaptors**: Google Drive, Dropbox, OneDrive, S3
+- **Social Media Adaptors**: Facebook photos, X posts, Instagram
+- **Content-Addressable Storage**: Deduplicated blob storage for efficient space usage
+- **Metadata & Search**: Rich metadata with full-text search across all sources
+- **Workflow Automation**: Event-driven automation based on file changes
+- **Web UI**: Browser-based interface for visual file management
 
-Please submit issues and send your feedback and suggestions as often as you have them.
-Also feel free to fork the project, create a feature branch, and send me a pull request for us to review.
+## Quick Start
 
-There is an IRC channel, `#fInspect` on Freenode, for talking directly
-to users (when awake and present, etc.).
+### Installation
 
-However we also have a Slack channel for talking directly to developers, testers etc.
-by invitation only (please contact in IRC if you want to join the Slack channel).
+```bash
+# Clone the repository
+git clone https://github.com/px4n/finspect.git
+cd finspect
 
-All code is licensed under the
-[AGPL](https://github.com/finspect/finspect/blob/master/LICENSE), v3 or later.
+# Build the project
+make build
+
+# Run tests
+make test
+```
+
+### Basic Usage
+
+```bash
+# Mount a local directory
+./bin/finspect mount local ~/Documents /docs
+
+# List files
+./bin/finspect ls /docs
+./bin/finspect ls -la /docs  # Show hidden files in long format
+
+# Copy files
+./bin/finspect cp /docs/report.pdf /docs/backup/report-2024.pdf
+
+# Move/rename files
+./bin/finspect mv /docs/old-name.txt /docs/new-name.txt
+
+# Remove files
+./bin/finspect rm /docs/temp.txt
+./bin/finspect rm -rf /docs/old-folder
+
+# Get file information
+./bin/finspect stat /docs/important.doc
+```
+
+### Advanced Example
+
+```bash
+# Mount multiple sources
+./bin/finspect mount local ~/Pictures /pics
+./bin/finspect mount local ~/Projects /projects
+./bin/finspect mount local /mnt/backup /backup
+
+# Work across mounts
+./bin/finspect cp /pics/vacation/*.jpg /backup/photos/2024/
+./bin/finspect ls -lH /projects  # Human-readable sizes
+```
+
+## Architecture
+
+finspect uses a modular architecture with clear separation of concerns:
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│     CLI     │     │   Web UI    │     │     API     │
+└──────┬──────┘     └──────┬──────┘     └──────┬──────┘
+       │                   │                    │
+       └───────────────────┴────────────────────┘
+                           │
+                    ┌──────▼──────┐
+                    │     VFS     │
+                    │   Router    │
+                    └──────┬──────┘
+                           │
+        ┌─────────────┬────┴────┬─────────────┐
+        │             │         │             │
+   ┌────▼────┐  ┌────▼────┐  ┌─▼──┐  ┌──────▼──────┐
+   │Filesystem│  │ Google  │  │ S3 │  │  Facebook   │
+   │ Adaptor  │  │  Drive  │  │    │  │   Photos    │
+   └──────────┘  └─────────┘  └────┘  └─────────────┘
+```
+
+## Development
+
+### Prerequisites
+
+- Go 1.22 or higher
+- Make
+- Git
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/px4n/finspect.git
+cd finspect
+
+# Install dependencies
+go mod download
+
+# Build
+make build
+
+# Run tests
+make test
+
+# Run with verbose output
+./bin/finspect -v ls /
+```
+
+### Project Structure
+
+```
+finspect/
+├── adaptors/          # Data source adaptors
+│   └── filesystem/    # Local filesystem adaptor
+├── cmd/
+│   └── finspect/     # CLI application
+├── pkg/
+│   └── vfs/          # Virtual filesystem core
+├── internal/
+│   └── pathutil/     # Path manipulation utilities
+├── docs/             # Documentation
+└── test/             # Integration tests
+```
+
+## Contributing
+
+I welcome contributions. Please see the [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Areas for Contribution
+
+- New adaptors (cloud storage, databases, APIs)
+- UI improvements (web interface, desktop app)
+- Performance optimizations
+- Documentation and examples
+- Bug fixes and testing
+
+## Roadmap
+
+### Phase 1 ✅ (Complete)
+
+- Core VFS implementation
+- Local filesystem adaptor
+- Basic CLI operations
+- Path manipulation utilities
+
+### Phase 2 🚧 (In Progress)
+
+- Metadata system
+- Search and indexing
+- Cloud storage adaptors
+- Configuration management
+
+### Phase 3 📋 (Planned)
+
+- Social media adaptors
+- Content-addressable blob storage
+- Workflow automation
+- Web-based UI
+
+### Phase 4 🔮 (Future)
+
+- Mobile apps
+- P2P synchronization
+- AI-powered organization
+- Plugin system
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Inspired by [Perkeep](https://perkeep.org/) (formerly Camlistore)
+- Built with [Cobra](https://github.com/spf13/cobra) for CLI
+- Uses [fsnotify](https://github.com/fsnotify/fsnotify) for file watching
+
+## Contact
+
+- GitHub Issues: [github.com/px4n/finspect/issues](https://github.com/px4n/finspect/issues)
+
+---
+
+**Note**: This project is under active development. APIs and features may change.
