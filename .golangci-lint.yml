@@ -1,0 +1,67 @@
+# golangci-lint configuration
+# https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - bodyclose
+    - dogsled
+    - dupl
+    - errcheck
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - prealloc
+    - revive
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+
+linters-settings:
+  dupl:
+    threshold: 100
+  gocyclo:
+    min-complexity: 15
+  lll:
+    line-length: 120
+  govet:
+    enable:
+      - shadow
+  misspell:
+    locale: US
+
+issues:
+  exclude-dirs-use-default: false
+  exclude-files:
+    - "vendor/.*"
+    - "test/fixtures/.*"
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+
+    # Exclude known issues in generated files
+    - path: "mock_"
+      linters:
+        - lll
+        - dupl

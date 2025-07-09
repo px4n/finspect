@@ -282,8 +282,8 @@ func TestRouterListMounts(t *testing.T) {
 	adaptor1 := newMockAdaptor("test1")
 	adaptor2 := newMockAdaptor("test2")
 
-	router.Mount("/mount1", adaptor1)
-	router.Mount("/mount2", adaptor2)
+	_ = router.Mount("/mount1", adaptor1)
+	_ = router.Mount("/mount2", adaptor2)
 
 	mounts := router.ListMounts()
 	assert.Len(t, mounts, 2)
@@ -294,7 +294,7 @@ func TestRouterListMounts(t *testing.T) {
 func TestRouterFileOperations(t *testing.T) {
 	router := vfs.NewRouter()
 	adaptor := newMockAdaptor("test")
-	router.Mount("/test", adaptor)
+	_ = router.Mount("/test", adaptor)
 
 	// Create a file
 	file, err := router.Create("/test/newfile.txt")
@@ -324,7 +324,7 @@ func TestRouterFileOperations(t *testing.T) {
 func TestRouterStat(t *testing.T) {
 	router := vfs.NewRouter()
 	adaptor := newMockAdaptor("test")
-	router.Mount("/test", adaptor)
+	_ = router.Mount("/test", adaptor)
 
 	// Create a file in the mock adaptor
 	adaptor.files["/testfile.txt"] = &mockFile{
@@ -346,7 +346,7 @@ func TestRouterStat(t *testing.T) {
 func TestRouterReadDir(t *testing.T) {
 	router := vfs.NewRouter()
 	adaptor := newMockAdaptor("test")
-	router.Mount("/test", adaptor)
+	_ = router.Mount("/test", adaptor)
 
 	// Read directory
 	entries, err := router.ReadDir("/test")
@@ -362,7 +362,7 @@ func TestRouterReadDir(t *testing.T) {
 func TestRouterRename(t *testing.T) {
 	router := vfs.NewRouter()
 	adaptor := newMockAdaptor("test")
-	router.Mount("/test", adaptor)
+	_ = router.Mount("/test", adaptor)
 
 	// Create a file
 	adaptor.files["/oldname.txt"] = &mockFile{
@@ -390,9 +390,8 @@ func TestRouterCrossDeviceRename(t *testing.T) {
 	router := vfs.NewRouter()
 	adaptor1 := newMockAdaptor("test1")
 	adaptor2 := newMockAdaptor("test2")
-
-	router.Mount("/mount1", adaptor1)
-	router.Mount("/mount2", adaptor2)
+	_ = router.Mount("/mount1", adaptor1)
+	_ = router.Mount("/mount2", adaptor2)
 
 	// Create a file in mount1
 	adaptor1.files["/file.txt"] = &mockFile{
@@ -411,7 +410,7 @@ func TestRouterCrossDeviceRename(t *testing.T) {
 func TestRouterClose(t *testing.T) {
 	router := vfs.NewRouter()
 	adaptor := newMockAdaptor("test")
-	router.Mount("/test", adaptor)
+	_ = router.Mount("/test", adaptor)
 
 	// Close router
 	err := router.Close()

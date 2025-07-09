@@ -24,19 +24,15 @@ func newCpCmd() *cobra.Command {
 		Long:  `Copy files and directories within the VFS or between VFS and local filesystem.`,
 		Args:  cobra.ExactArgs(2),
 		Run: func(_ *cobra.Command, args []string) {
-			source := resolvePath(args[0])
-			dest := resolvePath(args[1])
+			paths := resolvePaths(args[0], args[1])
+			source, dest := paths[0], paths[1]
 
 			vfs := getVFS()
 
 			// Get source info
 			sourceInfo, err := vfs.Stat(source)
 			if err != nil {
-				logger.Error("Failed to stat source",
-					zap.String("source", source),
-					zap.Error(err))
-				fmt.Fprintf(os.Stderr, "cp: %s: %v\n", source, err)
-				os.Exit(1)
+				handleCommandError("cp", "stat source", source, err)
 			}
 
 			if sourceInfo.IsDir() && !cpRecursive {
@@ -63,12 +59,9 @@ func newCpCmd() *cobra.Command {
 			}
 
 			if err != nil {
-				logger.Error("Copy failed",
+				handleCommandErrorWithFields("cp", "copy", err,
 					zap.String("source", source),
-					zap.String("dest", dest),
-					zap.Error(err))
-				fmt.Fprintf(os.Stderr, "cp: %v\n", err)
-				os.Exit(1)
+					zap.String("dest", dest))
 			}
 
 			if cpVerbose {

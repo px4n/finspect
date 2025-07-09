@@ -122,7 +122,9 @@ func (r *Router) resolve(absPath string) (Adaptor, string, error) {
 
 	// Find the longest matching mount point
 	for _, mountPath := range r.paths {
-		if absPath == mountPath || strings.HasPrefix(absPath, mountPath+"/") {
+		if absPath == mountPath ||
+			strings.HasPrefix(absPath, mountPath+"/") ||
+			(mountPath == "/" && strings.HasPrefix(absPath, "/")) {
 			adaptor := r.mounts[mountPath]
 			relPath := strings.TrimPrefix(absPath, mountPath)
 			if relPath == "" {
@@ -297,8 +299,14 @@ func (r *Router) Lstat(name string) (FileInfo, error) {
 
 // ReadDir reads the directory and returns its contents.
 func (r *Router) ReadDir(name string) ([]DirEntry, error) {
-	// Special case: root directory lists all mount points
-	if name == "/" {
+	// Special case: if we have a root mount and asking for root dir,
+	// delegate to the root mount instead of listing mount points
+	r.mu.RLock()
+	_, hasRootMount := r.mounts["/"]
+	r.mu.RUnlock()
+
+	if name == "/" && !hasRootMount {
+		// No root mount, list mount points
 		return r.readRootDir()
 	}
 

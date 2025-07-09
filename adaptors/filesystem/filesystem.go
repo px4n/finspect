@@ -96,11 +96,14 @@ func (a *Adaptor) Capabilities() vfs.Capabilities {
 
 // resolvePath converts a VFS path to a real filesystem path.
 func (a *Adaptor) resolvePath(vfsPath string) string {
-	if vfsPath == "/" {
+	if vfsPath == "/" || vfsPath == "" {
 		return a.root
 	}
-	// Remove leading slash and join with root
-	return filepath.Join(a.root, vfsPath[1:])
+	// Remove leading slash if present and join with root
+	if vfsPath[0] == '/' {
+		vfsPath = vfsPath[1:]
+	}
+	return filepath.Join(a.root, vfsPath)
 }
 
 // Open opens the named file for reading.

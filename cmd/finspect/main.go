@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/px4n/finspect/adaptors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -13,7 +14,8 @@ import (
 
 var (
 	// Version information (set by build flags)
-	Version   = "dev"
+	Version = "dev"
+	// BuildTime is the time when the binary was built
 	BuildTime = "unknown"
 
 	// Global flags
@@ -55,6 +57,8 @@ func setupCommands() {
 		rmCmd,
 		statCmd,
 		searchCmd,
+		metadataCmd,
+		configCmd,
 	)
 }
 
@@ -107,6 +111,9 @@ func initLogger() {
 }
 
 func main() {
+	// Register all cloud storage adaptors
+	adaptors.RegisterAll()
+
 	setupCommands()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

@@ -8,22 +8,22 @@ finspect treats all data sources as a unified filesystem. Whether your files are
 
 ## Features
 
-### Current (Phase 1)
+### Current
 
 - **Virtual Filesystem (VFS)**: Mount any data source and access it like a local filesystem
-- **Local Filesystem Adaptor**: Full support for local files and directories
 - **POSIX Operations**: Standard file operations (ls, cp, mv, rm, stat)
+- **Metadata & Search**: Extract metadata and perform full-text search with Bleve
+- **Cloud Storage**: S3 and Google Drive support with streaming operations
+- **Configuration**: YAML/JSON config with environment variable overrides
 - **File Watching**: Real-time notifications for file changes
-- **CLI Interface**: Familiar command-line tools for file management
 
-### Planned (Phase 2+)
+### Planned
 
-- **Cloud Storage Adaptors**: Google Drive, Dropbox, OneDrive, S3
+- **More Cloud Storage**: Dropbox, OneDrive, Azure Blob Storage
 - **Social Media Adaptors**: Facebook photos, X posts, Instagram
-- **Content-Addressable Storage**: Deduplicated blob storage for efficient space usage
-- **Metadata & Search**: Rich metadata with full-text search across all sources
-- **Workflow Automation**: Event-driven automation based on file changes
-- **Web UI**: Browser-based interface for visual file management
+- **Content-Addressable Storage**: Deduplicated blob storage
+- **Workflow Automation**: Event-driven file processing
+- **Web UI**: Browser-based file management
 
 ## Quick Start
 
@@ -65,17 +65,91 @@ make test
 ./bin/finspect stat /docs/important.doc
 ```
 
+### Metadata and Search
+
+```bash
+# Extract and store metadata for a file
+./bin/finspect metadata extract /docs/report.pdf
+
+# Index an entire directory for search
+./bin/finspect metadata index /docs --full-text
+
+# Search metadata by content type
+./bin/finspect metadata search --type "application/pdf"
+
+# Full-text search across indexed files
+./bin/finspect metadata search --text "quarterly report" --full-text
+
+# Show stored metadata for a file
+./bin/finspect metadata show /docs/report.pdf
+```
+
+### S3 Integration
+
+```bash
+# Mount S3 bucket (requires AWS credentials)
+export AWS_ACCESS_KEY_ID=your-key
+export AWS_SECRET_ACCESS_KEY=your-secret
+./bin/finspect mount s3 my-bucket /s3 --region us-east-1
+
+# List S3 files
+./bin/finspect ls /s3
+
+# Copy between local and S3
+./bin/finspect cp /docs/report.pdf /s3/reports/2024/
+./bin/finspect cp /s3/data.csv /docs/downloads/
+```
+
+### Configuration
+
+```bash
+# Initialize configuration file
+./bin/finspect config init
+
+# Show current configuration
+./bin/finspect config show
+
+# Use custom configuration
+./bin/finspect --config custom.yaml ls /
+
+# Configuration via environment variables
+export FINSPECT_METADATA_DATABASE=/var/lib/finspect/metadata.db
+export FINSPECT_SEARCH_INDEX=/var/lib/finspect/search.bleve
+```
+
 ### Advanced Example
 
 ```bash
-# Mount multiple sources
-./bin/finspect mount local ~/Pictures /pics
-./bin/finspect mount local ~/Projects /projects
-./bin/finspect mount local /mnt/backup /backup
+# Create configuration for multiple mounts
+cat > finspect.yaml << EOF
+mounts:
+  - path: "/"
+    type: "filesystem"
+    config:
+      root: "$HOME"
+  - path: "/s3"
+    type: "s3"
+    config:
+      bucket: "my-data"
+      region: "us-east-1"
+  - path: "/gdrive"
+    type: "googledrive"
+    config:
+      credentials:
+        service_account_key: "/path/to/key.json"
+EOF
 
-# Work across mounts
-./bin/finspect cp /pics/vacation/*.jpg /backup/photos/2024/
-./bin/finspect ls -lH /projects  # Human-readable sizes
+# Index everything with metadata and search
+./bin/finspect metadata index / --full-text
+./bin/finspect metadata index /s3 --full-text
+./bin/finspect metadata index /gdrive --full-text
+
+# Search across all mounted sources
+./bin/finspect metadata search --text "project report" --full-text
+
+# Copy files between different storage backends
+./bin/finspect cp /gdrive/Documents/report.pdf /s3/backups/
+./bin/finspect cp /s3/data/*.csv /local/analysis/
 ```
 
 ## Architecture
@@ -135,13 +209,18 @@ make test
 ```
 finspect/
 ├── adaptors/          # Data source adaptors
-│   └── filesystem/    # Local filesystem adaptor
+│   ├── filesystem/    # Local filesystem adaptor
+│   ├── s3/           # AWS S3 adaptor
+│   └── cloud/        # Cloud storage framework
 ├── cmd/
 │   └── finspect/     # CLI application
 ├── pkg/
-│   └── vfs/          # Virtual filesystem core
+│   ├── vfs/          # Virtual filesystem core
+│   ├── metadata/     # Metadata extraction and storage
+│   └── search/       # Full-text search with Bleve
 ├── internal/
 │   └── pathutil/     # Path manipulation utilities
+├── examples/         # Usage examples
 ├── docs/             # Documentation
 └── test/             # Integration tests
 ```
@@ -160,28 +239,28 @@ I welcome contributions. Please see the [Contributing Guide](CONTRIBUTING.md) fo
 
 ## Roadmap
 
-### Phase 1 ✅ (Complete)
+### Phase 1 (Complete)
 
 - Core VFS implementation
 - Local filesystem adaptor
 - Basic CLI operations
 - Path manipulation utilities
 
-### Phase 2 🚧 (In Progress)
+### Phase 2 (Complete)
 
-- Metadata system
-- Search and indexing
-- Cloud storage adaptors
-- Configuration management
+- Metadata system with SQLite backend
+- Full-text search and indexing with Bleve
+- S3 cloud storage adaptor
+- Cloud storage framework for extensibility
 
-### Phase 3 📋 (Planned)
+### Phase 3 (Planned)
 
 - Social media adaptors
 - Content-addressable blob storage
 - Workflow automation
 - Web-based UI
 
-### Phase 4 🔮 (Future)
+### Phase 4 (Future)
 
 - Mobile apps
 - P2P synchronization

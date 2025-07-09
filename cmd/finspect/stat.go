@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var statCmd = &cobra.Command{
@@ -24,10 +22,7 @@ var statCmd = &cobra.Command{
 			path := resolvePath(arg)
 			info, err := vfs.Stat(path)
 			if err != nil {
-				logger.Error("Failed to stat",
-					zap.String("path", path),
-					zap.Error(err))
-				fmt.Fprintf(os.Stderr, "stat: %s: %v\n", path, err)
+				handleNonFatalError("stat", path, err)
 				continue
 			}
 

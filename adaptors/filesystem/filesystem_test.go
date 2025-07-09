@@ -231,7 +231,7 @@ func TestFilesystemAdaptorWatch(t *testing.T) {
 	}
 	err = adaptor.Connect(context.Background(), config)
 	require.NoError(t, err)
-	defer adaptor.Disconnect()
+	defer func() { _ = adaptor.Disconnect() }()
 
 	t.Run("WatchFile", func(t *testing.T) {
 		events := make(chan vfs.Event, 10)
@@ -239,7 +239,7 @@ func TestFilesystemAdaptorWatch(t *testing.T) {
 		// Start watching
 		err := adaptor.Watch("/", false, events)
 		assert.NoError(t, err)
-		defer adaptor.Unwatch("/")
+		defer func() { _ = adaptor.Unwatch("/") }()
 
 		// Give watcher time to start
 		time.Sleep(100 * time.Millisecond)
@@ -353,7 +353,7 @@ func TestFilesystemAdaptorEdgeCases(t *testing.T) {
 	}
 	err = adaptor.Connect(context.Background(), config)
 	require.NoError(t, err)
-	defer adaptor.Disconnect()
+	defer func() { _ = adaptor.Disconnect() }()
 
 	t.Run("SymlinkSupport", func(t *testing.T) {
 		// Create a regular file

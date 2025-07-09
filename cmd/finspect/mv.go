@@ -19,19 +19,15 @@ func newMvCmd() *cobra.Command {
 		Long:  `Move or rename files and directories within the VFS.`,
 		Args:  cobra.ExactArgs(2),
 		Run: func(_ *cobra.Command, args []string) {
-			source := resolvePath(args[0])
-			dest := resolvePath(args[1])
+			paths := resolvePaths(args[0], args[1])
+			source, dest := paths[0], paths[1]
 
 			vfs := getVFS()
 
 			// Check if source exists
 			_, err := vfs.Stat(source)
 			if err != nil {
-				logger.Error("Failed to stat source",
-					zap.String("source", source),
-					zap.Error(err))
-				fmt.Fprintf(os.Stderr, "mv: %s: %v\n", source, err)
-				os.Exit(1)
+				handleCommandError("mv", "stat source", source, err)
 			}
 
 			// Check if destination exists
@@ -56,17 +52,13 @@ func newMvCmd() *cobra.Command {
 
 			// Perform the rename
 			if err := vfs.Rename(source, dest); err != nil {
-				logger.Error("Failed to move",
-					zap.String("source", source),
-					zap.String("dest", dest),
-					zap.Error(err))
-
 				// Check if it's a cross-device error
-				fmt.Fprintf(os.Stderr, "mv: %v\n", err)
 				if err.Error() == "vfs: cross-device operation not permitted" {
 					fmt.Fprintf(os.Stderr, "mv: %s and %s are on different mounts, use cp instead\n", source, dest)
 				}
-				os.Exit(1)
+				handleCommandErrorWithFields("mv", "move", err,
+					zap.String("source", source),
+					zap.String("dest", dest))
 			}
 
 			if mvVerbose {

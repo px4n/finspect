@@ -36,11 +36,7 @@ func newLsCmd() *cobra.Command {
 			// Read directory
 			entries, err := vfs.ReadDir(path)
 			if err != nil {
-				logger.Error("Failed to read directory",
-					zap.String("path", path),
-					zap.Error(err))
-				fmt.Fprintf(os.Stderr, "ls: %s: %v\n", path, err)
-				os.Exit(1)
+				handleCommandError("ls", "read directory", path, err)
 			}
 
 			// Display entries

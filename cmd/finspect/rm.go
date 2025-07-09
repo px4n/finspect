@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var (
@@ -32,11 +31,7 @@ func newRmCmd() *cobra.Command {
 				info, err := vfs.Stat(path)
 				if err != nil {
 					if !rmForce {
-						logger.Error("Failed to stat path",
-							zap.String("path", path),
-							zap.Error(err))
-						fmt.Fprintf(os.Stderr, "rm: %s: %v\n", path, err)
-						exitCode = 1
+						handleCommandError("rm", "stat", path, err)
 					}
 					continue
 				}
@@ -56,12 +51,7 @@ func newRmCmd() *cobra.Command {
 				}
 
 				if err != nil {
-					logger.Error("Failed to remove",
-						zap.String("path", path),
-						zap.Error(err))
-					fmt.Fprintf(os.Stderr, "rm: %s: %v\n", path, err)
-					exitCode = 1
-					continue
+					handleCommandError("rm", "remove", path, err)
 				}
 
 				if rmVerbose {
