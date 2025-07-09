@@ -55,3 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Go naming conventions by removing type stuttering (e.g., `CloudProvider` → `Provider`)
 - Centralized CLI error handling into reusable utility functions
 - Improved code organization and maintainability
+
+## [0.1.0] - TBD
+
+Initial release (planned)

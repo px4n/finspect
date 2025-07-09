@@ -390,7 +390,6 @@ func TestRouterCrossDeviceRename(t *testing.T) {
 	router := vfs.NewRouter()
 	adaptor1 := newMockAdaptor("test1")
 	adaptor2 := newMockAdaptor("test2")
-
 	_ = router.Mount("/mount1", adaptor1)
 	_ = router.Mount("/mount2", adaptor2)
 
