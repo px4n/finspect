@@ -1,0 +1,185 @@
+# finspect Configuration Example
+# This file demonstrates all available configuration options
+
+# Global settings
+global:
+  # Working directory for finspect operations
+  work_dir: "."
+
+  # Temporary directory for intermediate files
+  temp_dir: "${TMPDIR:-/tmp}"
+
+  # Maximum number of concurrent operations
+  max_concurrency: 10
+
+  # Enable performance profiling
+  enable_profiling: false
+
+# VFS mount configurations
+mounts:
+  # Local filesystem mount
+  - path: "/"
+    type: "filesystem"
+    config:
+      root: "."
+    options:
+      read_only: false
+      enable_cache: true
+      cache_ttl: 300 # 5 minutes
+      enable_metadata: true
+
+  # Example S3 mount
+  - path: "/s3"
+    type: "s3"
+    config:
+      bucket: "my-bucket"
+      region: "us-east-1"
+      # Credentials can be provided here or via AWS credentials chain
+      # credentials:
+      #   access_key: "${AWS_ACCESS_KEY_ID}"
+      #   secret_key: "${AWS_SECRET_ACCESS_KEY}"
+    options:
+      read_only: false
+      enable_cache: true
+      cache_ttl: 600 # 10 minutes
+      enable_metadata: true
+
+  # Example Google Drive mount
+  - path: "/gdrive"
+    type: "googledrive"
+    config:
+      # OAuth2 credentials
+      # credentials:
+      #   client_id: "${GOOGLE_CLIENT_ID}"
+      #   client_secret: "${GOOGLE_CLIENT_SECRET}"
+      #   refresh_token: "${GOOGLE_REFRESH_TOKEN}"
+
+      # Or use service account
+      # credentials:
+      #   service_account_key: "/path/to/key.json"
+    options:
+      read_only: false
+      enable_cache: true
+      cache_ttl: 900 # 15 minutes
+      enable_metadata: true
+
+# Metadata system configuration
+metadata:
+  # SQLite database path
+  database_path: "finspect.db"
+
+  # Enable full-text search with FTS5
+  enable_fts: false # Set to true if SQLite is compiled with FTS5
+
+  # Batch size for bulk operations
+  batch_size: 100
+
+  # Automatically index new files
+  auto_index: false
+
+  # Metadata extractors
+  extractors:
+    # Enable built-in extractors
+    enable_image: true
+    enable_document: true
+    enable_media: true
+
+    # Custom extractors
+    custom:
+      # Example: Extract metadata from custom file types
+      - name: "project-files"
+        patterns: ["*.project", "*.proj"]
+        command: "extract-project-metadata"
+        args: ["--format", "json", "--file"]
+
+# Search system configuration
+search:
+  # Bleve index path
+  index_path: "finspect.bleve"
+
+  # Enable search functionality
+  enabled: true
+
+  # Default result limit
+  default_limit: 20
+
+  # Index options
+  index_options:
+    # Index file contents
+    index_content: true
+
+    # Maximum content size to index (1MB)
+    max_content_size: 1048576
+
+    # Content types to index
+    content_types:
+      - "text/plain"
+      - "text/markdown"
+      - "text/html"
+      - "text/css"
+      - "text/javascript"
+      - "application/json"
+      - "application/xml"
+      - "text/yaml"
+
+    # Enable search result highlighting
+    enable_highlighting: true
+
+    # Enable faceted search
+    enable_facets: true
+
+# Admin UI configuration
+admin_ui:
+  # Enable the web-based admin interface
+  enabled: true
+
+  # Listen address (use 0.0.0.0 for all interfaces)
+  address: "127.0.0.1"
+
+  # Listen port
+  port: 8080
+
+  # Static files directory
+  static_dir: "./admin-ui/dist"
+
+  # Enable authentication
+  enable_auth: false
+
+  # Authentication configuration
+  auth:
+    # Authentication type (basic, oauth2)
+    type: "basic"
+
+    # Type-specific configuration
+    config:
+      # For basic auth
+      # users:
+      #   - username: "admin"
+      #     password_hash: "$2a$10$..."  # bcrypt hash
+
+      # For OAuth2
+      # client_id: "${OAUTH_CLIENT_ID}"
+      # client_secret: "${OAUTH_CLIENT_SECRET}"
+      # redirect_url: "http://localhost:8080/auth/callback"
+
+# Logging configuration
+logging:
+  # Log level (debug, info, warn, error)
+  level: "info"
+
+  # Log format (text, json)
+  format: "text"
+
+  # Log output (stdout, stderr, file)
+  output: "stdout"
+
+  # Log file path (when output is "file")
+  file_path: "finspect.log"
+
+  # Enable log rotation
+  enable_rotation: false
+
+  # Log rotation settings
+  max_size: 100 # MB
+  max_backups: 3 # Number of old files to keep
+  max_age: 30 # Days
